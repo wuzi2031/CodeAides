@@ -1,4 +1,4 @@
-package com.example.wzm.codeaides.widget;
+package com.example.wzm.codeaides.widget.loading;
 
 import android.content.Context;
 import android.util.AttributeSet;

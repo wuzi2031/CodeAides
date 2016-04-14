@@ -1,4 +1,4 @@
-package com.example.wzm.codeaides.widget;
+package com.example.wzm.codeaides.widget.loading;
 
 import android.app.Dialog;
 import android.content.Context;

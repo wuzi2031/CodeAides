@@ -19,18 +19,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".widget.loading.LoadingCenterActivity" />
+        <activity android:name=".widget.viewpager3d.PagerActivity" />
+
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="570cabebe0f55a100700060b" >
-        </meta-data>
+            android:value="570cabebe0f55a100700060b"></meta-data>
         <meta-data
             android:name="UMENG_MESSAGE_SECRET"
-            android:value="6bb175a19191a2a033b3f538b5eebe86" >
-        </meta-data>
+            android:value="6bb175a19191a2a033b3f538b5eebe86"></meta-data>
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="Umeng" >
-        </meta-data>
+            android:value="Umeng"></meta-data>
     </application>
 
 </manifest>
