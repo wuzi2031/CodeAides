@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         UmengPushUtils.initStartAct(this);
         widgetLs.add("Loading");
-        widgetLs.add("ViewPager3D");
+        widgetLs.add("ViewPager3d");
         lv_widgets = (ListView) findViewById(R.id.lv_widgets);
         mainListAdapter = new MainListAdapter(widgetLs);
         lv_widgets.setAdapter(mainListAdapter);

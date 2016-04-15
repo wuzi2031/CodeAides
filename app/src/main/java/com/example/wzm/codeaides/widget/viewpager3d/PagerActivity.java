@@ -26,10 +26,11 @@ import java.util.ArrayList;
 public class PagerActivity extends AppCompatActivity {
     private ViewPager vp_pager;
     private ArrayList<Integer> imgLs = new ArrayList<>();
-    private ArrayList<View> pagerViewes;
+    private ArrayList<PageItem> pagerViewes;
     private MyViewPager myViewPager;
-    private RelativeLayout.LayoutParams nomalParams;
-    private RelativeLayout.LayoutParams smallParams;
+    private LinearLayout.LayoutParams bigParams;
+    private LinearLayout.LayoutParams smallParams;
+    private int upPos, downPos;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -41,36 +42,48 @@ public class PagerActivity extends AppCompatActivity {
         imgLs.add(R.drawable.top_pic_meishi);
         imgLs.add(R.drawable.top_pic_qiche);
         imgLs.add(R.drawable.top_pic_xiaozu);
-        nomalParams = new RelativeLayout.LayoutParams(RelativeLayout.
+        bigParams = new LinearLayout.LayoutParams(LinearLayout.
                 LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        nomalParams.setMargins(0, 0, 0, 0);
-        smallParams = new RelativeLayout.LayoutParams(RelativeLayout.
+
+        smallParams = new LinearLayout.LayoutParams(LinearLayout.
                 LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         smallParams.setMargins(0, 20, 0, 20);
         pagerViewes = inflatViews(imgLs);
         vp_pager = (ViewPager) findViewById(R.id.vp_pager);
         myViewPager = new MyViewPager(imgLs);
         vp_pager.setAdapter(myViewPager);
-        vp_pager.setCurrentItem(5000);
-
+        vp_pager.setCurrentItem(1);
         vp_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.e("position", position % imgLs.size() + "");
                 Log.e("positionOffset", positionOffset + "");
                 Log.e("positionOffsetPixels", positionOffsetPixels + "");
-                RelativeLayout rl_pagercurr = getPagerItem(position % pagerViewes.size());
-                RelativeLayout rl_pagerup = getPagerItem((position - 1) % pagerViewes.size());
-                RelativeLayout rl_pagerdown = getPagerItem((position + 1) % pagerViewes.size());
-                rl_pagercurr.setLayoutParams(nomalParams);
-                rl_pagerup.setLayoutParams(smallParams);
-                rl_pagerdown.setLayoutParams(smallParams);
-                rl_pagercurr.getParent().requestLayout();
+                upPos = position - 1;
+                downPos = position + 1;
+                RelativeLayout rl_pagercurr = getPagerItem(position);
+                bigParams.setMargins(0, (int) (20 * positionOffset), 0, (int) (20 * positionOffset));
+                rl_pagercurr.setLayoutParams(bigParams);
+                if (upPos >= 0 && upPos < pagerViewes.size()) {
+                    RelativeLayout rl_pagerup = getPagerItem(upPos);
+                    rl_pagerup.setLayoutParams(smallParams);
+                }
+                if (downPos >= 0 && downPos < pagerViewes.size()) {
+                    RelativeLayout rl_pagerdown = getPagerItem(downPos);
+                    rl_pagerdown.setLayoutParams(smallParams);
+                }
+                vp_pager.requestLayout();
             }
 
             @Override
             public void onPageSelected(int position) {
-
+                if (imgLs.size() > 1) { //多于1，才会循环跳转
+                    if (position < 1) { //首位之前，跳转到末尾（N）
+                        position = pagerViewes.size() - 2;
+                        vp_pager.setCurrentItem(position, false);
+                    } else if (position > pagerViewes.size() - 2) { //末位之后，跳转到首位（1）
+                        vp_pager.setCurrentItem(1, false); //false:不显示跳转过程的动画
+                    }
+                }
             }
 
             @Override
@@ -94,8 +107,7 @@ public class PagerActivity extends AppCompatActivity {
 
     private RelativeLayout getPagerItem(int pos) {
         try {
-            View view = pagerViewes.get(pos);
-            RelativeLayout rl_pagercurr = (RelativeLayout) view.findViewById(R.id.rl_pager);
+            RelativeLayout rl_pagercurr = pagerViewes.get(pos).getAnimView();
             return rl_pagercurr;
         } catch (Exception e) {
 
@@ -136,21 +148,36 @@ public class PagerActivity extends AppCompatActivity {
         view.getParent().requestLayout();
     }
 
-    public ArrayList<View> inflatViews(ArrayList<Integer> imges) {
+    public ArrayList<PageItem> inflatViews(ArrayList<Integer> imges) {
         if (imges == null || imges.size() == 0)
             return null;
-        ArrayList<View> views = new ArrayList<>();
-        for (int i = 0; i < imges.size(); i++) {
+        ArrayList<PageItem> views = new ArrayList<>();
+        for (int i = 0; i < imges.size() + 2; i++) {
+
             View view = LayoutInflater.from(PagerActivity.this).inflate(R.layout.item_viewpager, null);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_pager);
             RelativeLayout rl_pager = (RelativeLayout) view.findViewById(R.id.rl_pager);
-            iv.setImageResource(imges.get(i));
             if (i == 0) {
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                iv.setImageResource(imges.get(imges.size() - 1));
+            } else if (i == imges.size() + 1) {
+                iv.setImageResource(imges.get(0));
+            } else {
+                iv.setImageResource(imges.get(i - 1));
+            }
+
+            if (i == 1) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                 params.setMargins(0, 0, 0, 0);
                 rl_pager.setLayoutParams(params);
+            } else {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                params.setMargins(0, 20, 0, 20);
+                rl_pager.setLayoutParams(params);
             }
-            views.add(view);
+            PageItem pageItem = new PageItem();
+            pageItem.setAnimView(rl_pager);
+            pageItem.setRootView(view);
+            views.add(pageItem);
         }
         return views;
     }
@@ -164,7 +191,7 @@ public class PagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return Integer.MAX_VALUE;
+            return pagerViewes.size();
         }
 
         @Override
@@ -179,12 +206,11 @@ public class PagerActivity extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = pagerViewes.get(position % pagerViewes.size());
-            if (view != null && view.getParent() == null) {
-//                container.removeView(view);
-                container.addView(view);
+            if (pagerViewes == null || pagerViewes.size() == 0) {
+                return null;
             }
-
+            View view = pagerViewes.get(position).getRootView();
+            container.addView(view);
             return view;
         }
     }
