@@ -21,16 +21,21 @@ import com.example.wzm.codeaides.R;
 import java.util.ArrayList;
 
 /**
- * Created by wzm on 2016/4/14.
+ * Created by wzm on MARGINPX16/4/14.
  */
 public class PagerActivity extends AppCompatActivity {
+    public final static int MARGINPX = 10;
+    private final static int INITPOS = 10000;
     private ViewPager vp_pager;
     private ArrayList<Integer> imgLs = new ArrayList<>();
     private ArrayList<PageItem> pagerViewes;
     private MyViewPager myViewPager;
     private LinearLayout.LayoutParams bigParams;
-    private LinearLayout.LayoutParams smallParams;
-    private int upPos, downPos;
+    private LinearLayout.LayoutParams upParams;
+    private LinearLayout.LayoutParams downParams;
+    private int currPos, upPos, downPos;
+    private boolean once = true, isSorcing;
+    float first = 0;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -45,45 +50,103 @@ public class PagerActivity extends AppCompatActivity {
         bigParams = new LinearLayout.LayoutParams(LinearLayout.
                 LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
 
-        smallParams = new LinearLayout.LayoutParams(LinearLayout.
+        upParams = new LinearLayout.LayoutParams(LinearLayout.
                 LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        smallParams.setMargins(0, 20, 0, 20);
+        upParams.setMargins(0, MARGINPX, 0, MARGINPX);
+        downParams = new LinearLayout.LayoutParams(LinearLayout.
+                LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        downParams.setMargins(0, MARGINPX, 0, MARGINPX);
         pagerViewes = inflatViews(imgLs);
         vp_pager = (ViewPager) findViewById(R.id.vp_pager);
         myViewPager = new MyViewPager(imgLs);
         vp_pager.setAdapter(myViewPager);
-        vp_pager.setCurrentItem(1);
+        vp_pager.setCurrentItem(INITPOS * pagerViewes.size());
+        vp_pager.setOffscreenPageLimit(0);
         vp_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.e("positionOffset", positionOffset + "");
-                Log.e("positionOffsetPixels", positionOffsetPixels + "");
-                upPos = position - 1;
-                downPos = position + 1;
-                RelativeLayout rl_pagercurr = getPagerItem(position);
-                bigParams.setMargins(0, (int) (20 * positionOffset), 0, (int) (20 * positionOffset));
-                rl_pagercurr.setLayoutParams(bigParams);
-                if (upPos >= 0 && upPos < pagerViewes.size()) {
+//                Log.e("positionOffset", positionOffset + "");
+//                Log.e("positionOffsetPixels", positionOffsetPixels + "");
+                Log.e("---", "---------------------------");
+                currPos = position % pagerViewes.size();
+                if (currPos == 0) {
+                    upPos = pagerViewes.size() - 1;
+                    downPos = currPos + 1;
+                } else if (currPos == pagerViewes.size() - 1) {
+                    upPos = currPos - 1;
+                    downPos = 0;
+                } else {
+                    upPos = currPos - 1;
+                    downPos = currPos + 1;
+                }
+//                Log.e("position", position + "");
+//                Log.e("upPos", upPos + "");
+//                Log.e("downPos", downPos + "");
+                boolean isdown = false, isup = false;
+                if (positionOffset != 0) {
+                    if (once) {
+                        first = positionOffset;
+                        Log.e("first", first + "");
+                        once = false;
+                    }
+                    Log.e("vula", (first - 0.5f) + "");
+                    if (first - 0.5f > 0) {
+                        isup = false;
+                        isdown = true;
+                    } else {
+                        isdown = false;
+                        isup = true;
+                    }
+                    RelativeLayout rl_pagercurr = getPagerItem(currPos);
+                    if (isdown) {
+                        Log.e("isdown", (int) (MARGINPX * (1 - positionOffset)) + "");
+                        bigParams.setMargins(0, (int) (MARGINPX * positionOffset), 0, (int) (MARGINPX * positionOffset));
+                        rl_pagercurr.setLayoutParams(bigParams);
+                    } else if (isup) {
+//                        if (downPos >= 0 && downPos < pagerViewes.size()) {
+                        Log.e("isup", (int) (MARGINPX * positionOffset) + "");
+                        RelativeLayout rl_pagerdown = getPagerItem(downPos);
+                        downParams.setMargins(0, (int) (MARGINPX * (1 - positionOffset)), 0, (int) (MARGINPX * (1 - positionOffset)));
+                        rl_pagerdown.setLayoutParams(downParams);
+//                        }
+                    }
+                } else {
+                    Log.e("none", "none");
+                    once = true;
+                    RelativeLayout rl_pagercurr = getPagerItem(currPos);
+                    bigParams.setMargins(0, 0, 0, 0);
+                    rl_pagercurr.setLayoutParams(bigParams);
+
+
                     RelativeLayout rl_pagerup = getPagerItem(upPos);
-                    rl_pagerup.setLayoutParams(smallParams);
-                }
-                if (downPos >= 0 && downPos < pagerViewes.size()) {
+
+                    upParams.setMargins(0, MARGINPX, 0, MARGINPX);
+
+
+                    rl_pagerup.setLayoutParams(upParams);
+
+
                     RelativeLayout rl_pagerdown = getPagerItem(downPos);
-                    rl_pagerdown.setLayoutParams(smallParams);
+                    downParams.setMargins(0, MARGINPX, 0, MARGINPX);
+                    rl_pagerdown.setLayoutParams(downParams);
+
+
                 }
+
+
                 vp_pager.requestLayout();
             }
 
             @Override
             public void onPageSelected(int position) {
-                if (imgLs.size() > 1) { //多于1，才会循环跳转
-                    if (position < 1) { //首位之前，跳转到末尾（N）
-                        position = pagerViewes.size() - 2;
-                        vp_pager.setCurrentItem(position, false);
-                    } else if (position > pagerViewes.size() - 2) { //末位之后，跳转到首位（1）
-                        vp_pager.setCurrentItem(1, false); //false:不显示跳转过程的动画
-                    }
-                }
+//                if (imgLs.size() > 1) { //多于1，才会循环跳转
+//                    if (position < 1) { //首位之前，跳转到末尾（N）
+//                        position = pagerViewes.size() - 2;
+//                        vp_pager.setCurrentItem(position, false);
+//                    } else if (position > pagerViewes.size() - 2) { //末位之后，跳转到首位（1）
+//                        vp_pager.setCurrentItem(1, false); //false:不显示跳转过程的动画
+//                    }
+//                }
             }
 
             @Override
@@ -115,63 +178,31 @@ public class PagerActivity extends AppCompatActivity {
         return null;
     }
 
-    /**
-     * This evaluator can be used to perform type interpolation between <code>float</code> values.
-     */
-    public static class FloatEvaluator implements TypeEvaluator<Number> {
-
-        /**
-         * This function returns the result of linearly interpolating the start and end values, with
-         * <code>fraction</code> representing the proportion between the start and end values. The
-         * calculation is a simple parametric calculation: <code>result = x0 + t * (v1 - v0)</code>,
-         * where <code>x0</code> is <code>startValue</code>, <code>x1</code> is <code>endValue</code>,
-         * and <code>t</code> is <code>fraction</code>.
-         *
-         * @param fraction   The fraction from the starting to the ending values
-         * @param startValue The start value; should be of type <code>float</code> or
-         *                   <code>Float</code>
-         * @param endValue   The end value; should be of type <code>float</code> or <code>Float</code>
-         * @return A linear interpolation between the start and end values, given the
-         * <code>fraction</code> parameter.
-         */
-        public Float evaluate(float fraction, Number startValue, Number endValue) {
-            float startFloat = startValue.floatValue();
-            return startFloat + fraction * (endValue.floatValue() - startFloat);
-        }
-    }
-
-    private void executeAnimator(View view, float currentChangeValue) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        int marginsValue = (int) currentChangeValue;
-        params.setMargins(marginsValue, marginsValue, marginsValue, marginsValue);
-        view.setLayoutParams(params);
-        view.getParent().requestLayout();
-    }
 
     public ArrayList<PageItem> inflatViews(ArrayList<Integer> imges) {
         if (imges == null || imges.size() == 0)
             return null;
         ArrayList<PageItem> views = new ArrayList<>();
-        for (int i = 0; i < imges.size() + 2; i++) {
+        for (int i = 0; i < imges.size(); i++) {
 
             View view = LayoutInflater.from(PagerActivity.this).inflate(R.layout.item_viewpager, null);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_pager);
             RelativeLayout rl_pager = (RelativeLayout) view.findViewById(R.id.rl_pager);
+//            if (i == 0) {
+//                iv.setImageResource(imges.get(imges.size() - 1));
+//            } else if (i == imges.size() + 1) {
+//                iv.setImageResource(imges.get(0));
+//            } else {
+//                iv.setImageResource(imges.get(i - 1));
+//            }
+            iv.setImageResource(imges.get(i));
             if (i == 0) {
-                iv.setImageResource(imges.get(imges.size() - 1));
-            } else if (i == imges.size() + 1) {
-                iv.setImageResource(imges.get(0));
-            } else {
-                iv.setImageResource(imges.get(i - 1));
-            }
-
-            if (i == 1) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                 params.setMargins(0, 0, 0, 0);
                 rl_pager.setLayoutParams(params);
             } else {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-                params.setMargins(0, 20, 0, 20);
+                params.setMargins(0, MARGINPX, 0, MARGINPX);
                 rl_pager.setLayoutParams(params);
             }
             PageItem pageItem = new PageItem();
@@ -191,7 +222,7 @@ public class PagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return pagerViewes.size();
+            return Integer.MAX_VALUE;
         }
 
         @Override
@@ -209,7 +240,7 @@ public class PagerActivity extends AppCompatActivity {
             if (pagerViewes == null || pagerViewes.size() == 0) {
                 return null;
             }
-            View view = pagerViewes.get(position).getRootView();
+            View view = pagerViewes.get(position % pagerViewes.size()).getRootView();
             container.addView(view);
             return view;
         }
