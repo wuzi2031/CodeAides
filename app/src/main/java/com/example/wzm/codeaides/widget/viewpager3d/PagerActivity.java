@@ -33,7 +33,7 @@ public class PagerActivity extends AppCompatActivity {
     private LinearLayout.LayoutParams bigParams;
     private LinearLayout.LayoutParams upParams;
     private LinearLayout.LayoutParams downParams;
-    private int currPos, upPos, downPos;
+    private int currPos, upPos, downPos, limitPageSize;
     private boolean once = true, isSorcing;
     float first = 0;
 
@@ -60,9 +60,10 @@ public class PagerActivity extends AppCompatActivity {
         vp_pager = (ViewPager) findViewById(R.id.vp_pager);
         myViewPager = new MyViewPager(imgLs);
         vp_pager.setAdapter(myViewPager);
-//        vp_pager.setCurrentItem(INITPOS * imgLs.size());
-        vp_pager.setCurrentItem(imgLs.size() / 2);
-        vp_pager.setOffscreenPageLimit(3);
+        vp_pager.setCurrentItem(INITPOS * imgLs.size());
+        limitPageSize = vp_pager.getOffscreenPageLimit();
+//        vp_pager.setCurrentItem(imgLs.size() / 2);
+//        vp_pager.setOffscreenPageLimit(0);
         vp_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -70,7 +71,7 @@ public class PagerActivity extends AppCompatActivity {
 //                Log.e("positionOffsetPixels", positionOffsetPixels + "");
                 Log.e("---", "---------------------------");
 //                currPos = position % pagerViewes.size();
-                currPos = position;
+//                currPos = position;
 //                if (currPos == 0) {
 //                    upPos = pagerViewes.size() - 1;
 //                    downPos = currPos + 1;
@@ -78,65 +79,63 @@ public class PagerActivity extends AppCompatActivity {
 //                    upPos = currPos - 1;
 //                    downPos = 0;
 //                } else {
-                upPos = currPos - 1;
-                downPos = currPos + 1;
+//                upPos = currPos - 1;
+//                downPos = currPos + 1;
 //                }
 //                Log.e("position", position + "");
 //                Log.e("upPos", upPos + "");
 //                Log.e("downPos", downPos + "");
-//                boolean isdown = false, isup = false;
-//                if (positionOffset != 0) {
-//                    if (once) {
-//                        first = positionOffset;
-//                        Log.e("first", first + "");
-//                        once = false;
-//                    }
-//                    Log.e("vula", (first - 0.5f) + "");
-//                    if (first - 0.5f > 0) {
-//                        isup = false;
-//                        isdown = true;
-//                    } else {
-//                        isdown = false;
-//                        isup = true;
-//                    }
-//                    RelativeLayout rl_pagercurr = getPagerItem(currPos);
-//                    if (isdown) {
-//                        Log.e("isdown", (int) (MARGINPX * (1 - positionOffset)) + "");
-//                        bigParams.setMargins(0, (int) (MARGINPX * positionOffset), 0, (int) (MARGINPX * positionOffset));
-//                        rl_pagercurr.setLayoutParams(bigParams);
-//                    } else if (isup) {
-////                        if (downPos >= 0 && downPos < pagerViewes.size()) {
-//                        Log.e("isup", (int) (MARGINPX * positionOffset) + "");
-//                        RelativeLayout rl_pagerdown = getPagerItem(downPos);
-//                        downParams.setMargins(0, (int) (MARGINPX * (1 - positionOffset)), 0, (int) (MARGINPX * (1 - positionOffset)));
-//                        rl_pagerdown.setLayoutParams(downParams);
-////                        }
-//                    }
-//                } else {
-//                    Log.e("none", "none");
-//                    once = true;
-//                    RelativeLayout rl_pagercurr = getPagerItem(currPos);
-//                    bigParams.setMargins(0, 0, 0, 0);
-//                    rl_pagercurr.setLayoutParams(bigParams);
-//
-//
-//                    RelativeLayout rl_pagerup = getPagerItem(upPos);
-//
-//                    upParams.setMargins(0, MARGINPX, 0, MARGINPX);
-//
-//
-//                    rl_pagerup.setLayoutParams(upParams);
-//
-//
-//                    RelativeLayout rl_pagerdown = getPagerItem(downPos);
-//                    downParams.setMargins(0, MARGINPX, 0, MARGINPX);
-//                    rl_pagerdown.setLayoutParams(downParams);
-//
-//
-//                }
-//
-//
-//                vp_pager.requestLayout();
+                boolean isdown = false, isup = false;
+                if (positionOffset != 0) {
+                    if (once) {
+                        first = positionOffset;
+                        Log.e("first", first + "");
+                        once = false;
+                    }
+                    Log.e("vula", (first - 0.5f) + "");
+                    if (first - 0.5f > 0) {
+                        isup = false;
+                        isdown = true;
+                    } else {
+                        isdown = false;
+                        isup = true;
+                    }
+                    RelativeLayout rl_pagercurr = getPagerItem(limitPageSize + 1);
+                    if (isdown) {
+                        Log.e("isdown", (int) (MARGINPX * (1 - positionOffset)) + "");
+                        bigParams.setMargins(0, (int) (MARGINPX * positionOffset), 0, (int) (MARGINPX * positionOffset));
+                        rl_pagercurr.setLayoutParams(bigParams);
+                    } else if (isup) {
+//                        if (downPos >= 0 && downPos < pagerViewes.size()) {
+                        Log.e("isup", (int) (MARGINPX * positionOffset) + "");
+                        RelativeLayout rl_pagerdown = getPagerItem(limitPageSize + 2);
+                        downParams.setMargins(0, (int) (MARGINPX * (1 - positionOffset)), 0, (int) (MARGINPX * (1 - positionOffset)));
+                        rl_pagerdown.setLayoutParams(downParams);
+//                        }
+                    }
+                } else {
+                    Log.e("position", position + "");
+                    Log.e("none", "none");
+                    once = true;
+                    RelativeLayout rl_pagercurr = getPagerItem(limitPageSize + 1);
+                    bigParams.setMargins(0, 0, 0, 0);
+                    rl_pagercurr.setLayoutParams(bigParams);
+
+
+                    RelativeLayout rl_pagerup = getPagerItem(limitPageSize);
+
+                    upParams.setMargins(0, MARGINPX, 0, MARGINPX);
+
+
+                    rl_pagerup.setLayoutParams(upParams);
+
+
+                    RelativeLayout rl_pagerdown = getPagerItem(limitPageSize + 2);
+                    downParams.setMargins(0, MARGINPX, 0, MARGINPX);
+                    rl_pagerdown.setLayoutParams(downParams);
+
+                }
+                vp_pager.requestLayout();
             }
 
             @Override
@@ -172,7 +171,6 @@ public class PagerActivity extends AppCompatActivity {
 
     private RelativeLayout getPagerItem(int pos) {
         try {
-//            RelativeLayout rl_pagercurr = pagerViewes.get(pos).getAnimView();
             View view = pagerViewes.get(pos);
             RelativeLayout rl_pagercurr = (RelativeLayout) view.findViewById(R.id.rl_pager);
             return rl_pagercurr;
@@ -238,6 +236,8 @@ public class PagerActivity extends AppCompatActivity {
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
             pagerViewes.remove(object);
+            Log.e("--------remove", pagerViewes.size() + "");
+            Log.e("remove", position + "");
         }
 
         @Override
@@ -258,6 +258,10 @@ public class PagerActivity extends AppCompatActivity {
 //            pageItem.setRootView(view);
             pagerViewes.add(view);
             container.addView(view);
+            Log.e("------------pagerViewes", position + "");
+            Log.e("pagerViewes", position % ls.size() + "");
+//            Log.e("container", container.getChildCount() + "");
+            Log.e("pagerViewes", pagerViewes.size() + "");
             return view;
         }
     }
