@@ -23,6 +23,8 @@ import java.util.ArrayList;
  * Created by wzm on MARGINPX16/4/14.
  */
 public class PagerActivity extends AppCompatActivity {
+    private static final float MIN_SCALE = 0.85f;
+    private static final float MIN_ALPHA = 0.5f;
     public final static int MARGINPX = 10;
     private final static int INITPOS = 10000;
     private ViewPager vp_pager;
@@ -62,6 +64,39 @@ public class PagerActivity extends AppCompatActivity {
         vp_pager.setAdapter(myViewPager);
         vp_pager.setCurrentItem(INITPOS * imgLs.size());
         limitPageSize = vp_pager.getOffscreenPageLimit();
+        if (limitPageSize < 2) {
+            limitPageSize = 2;
+        }
+        vp_pager.setPageTransformer(true, new ViewPager.PageTransformer() {
+            @Override
+            public void transformPage(View view, float position) {
+               float defaultScale = (float) 14 / (float) 15;
+                View cardView = view.findViewById(R.id.rl_pager);
+                int diffWidth = (cardView.getWidth() - cardView.getWidth()) / 2;
+
+                if (position < -1) { // [-Infinity,-1)
+                    cardView.setScaleX(defaultScale);
+                    cardView.setScaleY(defaultScale);
+                    cardView.setTranslationX(diffWidth);
+
+                } else if (position <= 0) { // [-1,0]
+                    cardView.setScaleX((float) 1 + position / (float) 15);
+                    cardView.setScaleY((float) 1 + position / (float) 15);
+                    cardView.setTranslationX((0 - position) * diffWidth);
+
+                } else if (position <= 1) { // (0,1]
+                    cardView.setScaleX((float) 1 - position / (float) 15);
+                    cardView.setScaleY((float) 1 - position / (float) 15);
+                    cardView.setTranslationX((0 - position) * diffWidth);
+
+                } else { // (1,+Infinity]
+                    cardView.setScaleX(defaultScale);
+                    cardView.setScaleY(defaultScale);
+                    cardView.setTranslationX(-diffWidth);
+                }
+
+            }
+        });
 //        vp_pager.setCurrentItem(imgLs.size() / 2);
 //        vp_pager.setOffscreenPageLimit(0);
         vp_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -69,7 +104,7 @@ public class PagerActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 //                Log.e("positionOffset", positionOffset + "");
 //                Log.e("positionOffsetPixels", positionOffsetPixels + "");
-                Log.e("---", "---------------------------");
+
 //                currPos = position % pagerViewes.size();
 //                currPos = position;
 //                if (currPos == 0) {
@@ -85,57 +120,59 @@ public class PagerActivity extends AppCompatActivity {
 //                Log.e("position", position + "");
 //                Log.e("upPos", upPos + "");
 //                Log.e("downPos", downPos + "");
-                boolean isdown = false, isup = false;
-                if (positionOffset != 0) {
-                    if (once) {
-                        first = positionOffset;
-                        Log.e("first", first + "");
-                        once = false;
-                    }
-                    Log.e("vula", (first - 0.5f) + "");
-                    if (first - 0.5f > 0) {
-                        isup = false;
-                        isdown = true;
-                    } else {
-                        isdown = false;
-                        isup = true;
-                    }
-                    RelativeLayout rl_pagercurr = getPagerItem(limitPageSize + 1);
-                    if (isdown) {
-                        Log.e("isdown", (int) (MARGINPX * (1 - positionOffset)) + "");
-                        bigParams.setMargins(0, (int) (MARGINPX * positionOffset), 0, (int) (MARGINPX * positionOffset));
-                        rl_pagercurr.setLayoutParams(bigParams);
-                    } else if (isup) {
-//                        if (downPos >= 0 && downPos < pagerViewes.size()) {
-                        Log.e("isup", (int) (MARGINPX * positionOffset) + "");
-                        RelativeLayout rl_pagerdown = getPagerItem(limitPageSize + 2);
-                        downParams.setMargins(0, (int) (MARGINPX * (1 - positionOffset)), 0, (int) (MARGINPX * (1 - positionOffset)));
-                        rl_pagerdown.setLayoutParams(downParams);
-//                        }
-                    }
-                } else {
-                    Log.e("position", position + "");
-                    Log.e("none", "none");
-                    once = true;
-                    RelativeLayout rl_pagercurr = getPagerItem(limitPageSize + 1);
-                    bigParams.setMargins(0, 0, 0, 0);
-                    rl_pagercurr.setLayoutParams(bigParams);
-
-
-                    RelativeLayout rl_pagerup = getPagerItem(limitPageSize);
-
-                    upParams.setMargins(0, MARGINPX, 0, MARGINPX);
-
-
-                    rl_pagerup.setLayoutParams(upParams);
-
-
-                    RelativeLayout rl_pagerdown = getPagerItem(limitPageSize + 2);
-                    downParams.setMargins(0, MARGINPX, 0, MARGINPX);
-                    rl_pagerdown.setLayoutParams(downParams);
-
-                }
-                vp_pager.requestLayout();
+//                boolean isdown = false, isup = false;
+//                if (positionOffset != 0) {
+//                    if (once) {
+//                        first = positionOffset;
+//                        Log.e("first", first + "");
+//                        once = false;
+//                    }
+//                    Log.e("vula", (first - 0.5f) + "");
+//                    if (first - 0.5f > 0) {
+//                        isup = false;
+//                        isdown = true;
+//                    } else {
+//                        isdown = false;
+//                        isup = true;
+//                    }
+//
+//                    if (isdown) {
+//                        RelativeLayout rl_pagercurr = getPagerItem(limitPageSize-1);
+//                        Log.e("isdown", (int) (MARGINPX * (1 - positionOffset)) + "");
+//                        bigParams.setMargins(0, (int) (MARGINPX * positionOffset), 0, (int) (MARGINPX * positionOffset));
+//                        rl_pagercurr.setLayoutParams(bigParams);
+//                    } else if (isup) {
+////                        if (downPos >= 0 && downPos < pagerViewes.size()) {
+//                        Log.e("isup", (int) (MARGINPX * positionOffset) + "");
+//                        RelativeLayout rl_pagerdown = getPagerItem(limitPageSize + 1);
+//                        downParams.setMargins(0, (int) (MARGINPX * (1 - positionOffset)), 0, (int) (MARGINPX * (1 - positionOffset)));
+//                        rl_pagerdown.setLayoutParams(downParams);
+////                        }
+//                    }
+//                } else {
+//                    Log.e("---", "---------------------------");
+//                    Log.e("position", position + "");
+//                    Log.e("none", "none");
+////                    once = true;
+////                    RelativeLayout rl_pagercurr = getPagerItem(limitPageSize);
+////                    bigParams.setMargins(0, 0, 0, 0);
+////                    rl_pagercurr.setLayoutParams(bigParams);
+////
+////
+////                    RelativeLayout rl_pagerup = getPagerItem(limitPageSize+1);
+////
+////                    upParams.setMargins(0, MARGINPX, 0, MARGINPX);
+////
+////
+////                    rl_pagerup.setLayoutParams(upParams);
+////
+////
+////                    RelativeLayout rl_pagerdown = getPagerItem(limitPageSize -1);
+////                    downParams.setMargins(0, MARGINPX, 0, MARGINPX);
+////                    rl_pagerdown.setLayoutParams(downParams);
+//
+//                }
+//                vp_pager.invalidate();
             }
 
             @Override
@@ -236,8 +273,8 @@ public class PagerActivity extends AppCompatActivity {
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
             pagerViewes.remove(object);
-            Log.e("--------remove", pagerViewes.size() + "");
-            Log.e("remove", position + "");
+//            Log.e("--------remove", pagerViewes.size() + "");
+//            Log.e("remove", position + "");
         }
 
         @Override
@@ -252,16 +289,17 @@ public class PagerActivity extends AppCompatActivity {
             View view = LayoutInflater.from(PagerActivity.this).inflate(R.layout.item_viewpager, null);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_pager);
             RelativeLayout rl_pager = (RelativeLayout) view.findViewById(R.id.rl_pager);
+            rl_pager.setLayoutParams(upParams);
             iv.setImageResource(ls.get(position % ls.size()));
 //            PageItem pageItem = new PageItem();
 //            pageItem.setAnimView(rl_pager);
 //            pageItem.setRootView(view);
             pagerViewes.add(view);
             container.addView(view);
-            Log.e("------------pagerViewes", position + "");
-            Log.e("pagerViewes", position % ls.size() + "");
-//            Log.e("container", container.getChildCount() + "");
-            Log.e("pagerViewes", pagerViewes.size() + "");
+//            Log.e("------------pagerViewes", position + "");
+//            Log.e("pagerViewes", position % ls.size() + "");
+////            Log.e("container", container.getChildCount() + "");
+//            Log.e("pagerViewes", pagerViewes.size() + "");
             return view;
         }
     }
