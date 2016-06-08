@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.wzm.codeaides.push.UmengPushUtils;
+import com.example.wzm.codeaides.rx_android.RxActivity;
 import com.example.wzm.codeaides.thirdLogin.ThirdLoginActivity;
 import com.example.wzm.codeaides.widget.loading.LoadingCenterActivity;
 import com.example.wzm.codeaides.widget.viewpager3d.PagerActivity;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         widgetLs.add("Loading");
         widgetLs.add("ViewPager3d");
         widgetLs.add("ThirdLoginSDK");
+        widgetLs.add("Rx_Aandroid");
         lv_widgets = (ListView) findViewById(R.id.lv_widgets);
         mainListAdapter = new MainListAdapter(widgetLs);
         lv_widgets.setAdapter(mainListAdapter);
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2:
                         startActivity(new Intent(MainActivity.this, ThirdLoginActivity.class));
+                        break;
+                    case 3:
+                        startActivity(new Intent(MainActivity.this, RxActivity.class));
                         break;
                     default:
                         break;
