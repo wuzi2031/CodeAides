@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.wzm.codeaides.mvp.view.MVPActivity;
 import com.example.wzm.codeaides.push.UmengPushUtils;
 import com.example.wzm.codeaides.rx_android.RxActivity;
 import com.example.wzm.codeaides.thirdLogin.ThirdLoginActivity;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         widgetLs.add("ViewPager3d");
         widgetLs.add("ThirdLoginSDK");
         widgetLs.add("Rx_Aandroid");
+        widgetLs.add("mvp");
         lv_widgets = (ListView) findViewById(R.id.lv_widgets);
         mainListAdapter = new MainListAdapter(widgetLs);
         lv_widgets.setAdapter(mainListAdapter);
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         startActivity(new Intent(MainActivity.this, RxActivity.class));
+                        break;
+                    case 4:
+                        startActivity(new Intent(MainActivity.this, MVPActivity.class));
                         break;
                     default:
                         break;
