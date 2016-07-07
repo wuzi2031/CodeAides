@@ -10,7 +10,7 @@ import android.widget.ListView;
 import com.example.wzm.codeaides.mvp.view.MVPActivity;
 import com.example.wzm.codeaides.push.UmengPushUtils;
 import com.example.wzm.codeaides.rx_android.RxActivity;
-import com.example.wzm.codeaides.thirdLogin.ThirdLoginActivity;
+import com.example.wzm.codeaides.thirdLogin_share.ThirdLoginActivity;
 import com.example.wzm.codeaides.widget.loading.LoadingCenterActivity;
 import com.example.wzm.codeaides.widget.viewpager3d.PagerActivity;
 

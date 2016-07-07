@@ -61,3 +61,10 @@
 -keep class android.net.compatibility.** { *; }
 -keep class android.net.http.** { *; }
 #友盟推送--end
+#微信
+-keep class com.tencent.mm.sdk.** {*;}
+#retrofit
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions

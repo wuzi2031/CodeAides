@@ -7,6 +7,7 @@ import com.example.wzm.codeaides.mvp.modle.JokerApi;
 import com.example.wzm.codeaides.mvp.modle.Modle;
 import com.example.wzm.codeaides.mvp.modle.RxService;
 import com.example.wzm.codeaides.mvp.view.IView;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -35,35 +36,26 @@ public class Presenter implements IPresenter {
 
     @Override
     public void onCreat() {
-        subscriber = new Subscriber<List<ContentlistEntity>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                view.setData(null);
-            }
-
-            @Override
-            public void onNext(List<ContentlistEntity> contentlistEntities) {
-                view.setData(contentlistEntities);
-            }
-        };
 
     }
 
     @Override
     public void onDestroy() {
-        if (subscriber != null && subscriber.isUnsubscribed())
-            subscriber.unsubscribe();
+
     }
 
     @Override
     public void onClick() {
-        RxService.creatApi(JokerApi.class).getJoke(1)
+        RxService.creatApi(JokerApi.class).getJokestr(1)
                 .subscribeOn(Schedulers.io())
+                .map(new Func1<String, JokeEntity>() {
+                    @Override
+                    public JokeEntity call(String s) {
+                        Gson gson = new Gson();
+                        JokeEntity jokeEntity = gson.fromJson(s, JokeEntity.class);
+                        return jokeEntity;
+                    }
+                })
                 .map(new Func1<JokeEntity, List<ContentlistEntity>>() {
                     @Override
                     public List<ContentlistEntity> call(JokeEntity jokeEntity) {
@@ -71,6 +63,21 @@ public class Presenter implements IPresenter {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribe(new Subscriber<List<ContentlistEntity>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.setData(null);
+                    }
+
+                    @Override
+                    public void onNext(List<ContentlistEntity> contentlistEntities) {
+                        view.setData(contentlistEntities);
+                    }
+                });
     }
 }
