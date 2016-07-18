@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.wzm.codeaides.mvp.view.MVPActivity;
+import com.example.wzm.codeaides.openGL.OpenGLActivity;
 import com.example.wzm.codeaides.push.UmengPushUtils;
 import com.example.wzm.codeaides.rx_android.RxActivity;
 import com.example.wzm.codeaides.thirdLogin_share.ThirdLoginActivity;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         widgetLs.add("ThirdLoginSDK");
         widgetLs.add("Rx_Aandroid");
         widgetLs.add("mvp");
+        widgetLs.add("openGL");
         lv_widgets = (ListView) findViewById(R.id.lv_widgets);
         mainListAdapter = new MainListAdapter(widgetLs);
         lv_widgets.setAdapter(mainListAdapter);
@@ -55,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
                         startActivity(new Intent(MainActivity.this, MVPActivity.class));
+                        break;
+                    case 5:
+                        startActivity(new Intent(MainActivity.this, OpenGLActivity.class));
                         break;
                     default:
                         break;

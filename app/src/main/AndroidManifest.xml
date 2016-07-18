@@ -29,6 +29,7 @@
         <activity android:name=".widget.viewpager3d.PagerActivity" />
         <activity android:name=".rx_android.RxActivity" />
         <activity android:name=".mvp.view.MVPActivity" />
+        <activity android:name=".openGL.OpenGLActivity" />
         <!--umeng push-->
         <meta-data
             android:name="UMENG_APPKEY"
