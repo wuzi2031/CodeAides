@@ -24,12 +24,6 @@ public class OpenGLView extends GLSurfaceView {
 
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
-        queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                mRenderer.setColor(event.getX()/getWidth(), event.getY()/getHeight(), 1.0f);
-            }
-        });
         return super.onTouchEvent(event);
     }
 }
